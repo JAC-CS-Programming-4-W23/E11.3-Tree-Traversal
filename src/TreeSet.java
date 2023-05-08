@@ -232,7 +232,13 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void toListPreOrder(Node<T> current, List<T> elements) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		elements.add(current.element);
+		toListPreOrder(current.left, elements);
+		toListPreOrder(current.right, elements);
 	}
 
 	public List<T> toListPostOrder() {
@@ -244,7 +250,13 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void toListPostOrder(Node<T> current, List<T> elements) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		toListPostOrder(current.left, elements);
+		toListPostOrder(current.right, elements);
+		elements.add(current.element);
 	}
 
 	public List<T> toListInOrder() {
@@ -256,7 +268,13 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void toListInOrder(Node<T> current, List<T> elements) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		toListInOrder(current.left, elements);
+		elements.add(current.element);
+		toListInOrder(current.right, elements);
 	}
 
 	public void prettyPrintPreOrder() {
@@ -264,7 +282,17 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void prettyPrintPreOrder(Node<T> current, int depth, String prefix) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		for (int i = 0; i < depth; i++) {
+			System.out.print("    ");
+		}
+		System.out.println(prefix + current.element);
+
+		prettyPrintPreOrder(current.left, depth + 1, "L: ");
+		prettyPrintPreOrder(current.right, depth + 1, "R: ");
 	}
 
 	public void prettyPrintPostOrder() {
@@ -272,7 +300,17 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void prettyPrintPostOrder(Node<T> current, int depth, String prefix) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		prettyPrintPostOrder(current.left, depth + 1, "L: ");
+		prettyPrintPostOrder(current.right, depth + 1, "R: ");
+
+		for (int i = 0; i < depth; i++) {
+			System.out.print("    ");
+		}
+		System.out.println(prefix + current.element);
 	}
 
 	public void prettyPrintInOrder() {
@@ -280,18 +318,79 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void prettyPrintInOrder(Node<T> current, int depth, String prefix) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		prettyPrintInOrder(current.left, depth + 1, "L: ");
+
+		for (int i = 0; i < depth; i++) {
+			System.out.print("    ");
+		}
+		System.out.println(prefix + current.element);
+
+		prettyPrintInOrder(current.right, depth + 1, "R: ");
 	}
 
-	public void prettyPrintChallenge(int height) {
-		prettyPrintChallenge(root, height);
+	public void prettyPrintChallenge() {
+		prettyPrintChallenge(root, 4);
 	}
 
 	public void prettyPrintChallenge(Node<T> root, int height) {
-		// TODO
-		// Not recursive!
-		// Hint: Use a breadth first traversal.
-		// Hint: https://stackoverflow.com/a/8964370
+		Queue<Node<T>> queue = new LinkedList<>();
+		Queue<Node<T>> nodes = new LinkedList<>() ;
+
+		queue.add(root);
+
+		// Breadth first traversal.
+		while (!queue.isEmpty()) {
+			Node<T> node = queue.poll();
+			nodes.add(node);
+
+			/*add left child to the queue */
+			if (node.left != null) {
+				queue.add(node.left);
+			}
+
+			/*add right child to the queue */
+			if (node.right != null) {
+				queue.add(node.right);
+			}
+		}
+
+		// https://stackoverflow.com/a/8964370
+		for (int depth = 1; !nodes.isEmpty(); depth++) {
+			int indent = (int) Math.pow(2, height - depth) - 1;
+			int spacing = (int) Math.pow(2, height - depth + 1) - 1;
+
+			for (int i = 0; i < indent; i++) {
+				System.out.print(" ");
+			}
+
+			for (int i = 0; i < (int) Math.pow(2, depth - 1); i++) {
+				Node<T> node = nodes.poll();
+
+				if (node != null) {
+					for (int j = 0; i != 0 && j < spacing; j++) {
+						System.out.print(" ");
+					}
+
+					System.out.print(node.element + " ");
+				}
+			}
+
+			System.out.println();
+		}
+	}
+
+	private void prettyPrint(Node<T> current, String prefix, boolean isLeft) {
+		if (current == null) {
+			return;
+		}
+
+		prettyPrint(current.left, prefix + (isLeft ? "|   " : "    "), true);
+		System.out.println(prefix + (isLeft ? "|-- " : "\\-- ") + current.element);
+		prettyPrint(current.right, prefix + (isLeft ? "|   " : "    "), false);
 	}
 
 	public List<T> subset(T min, T max) {
@@ -303,7 +402,24 @@ public class TreeSet<T extends Comparable<T>> implements Set<T> {
 	}
 
 	private void subset(Node<T> current, T min, T max, List<T> subset) {
-		// TODO
+		if (current == null) {
+			return;
+		}
+
+		int comparison1 = current.element.compareTo(min);
+		int comparison2 = current.element.compareTo(max);
+
+		if (comparison1 >= 0 && comparison2 < 0) {
+			subset.add(current.element);
+		}
+
+		if (comparison1 >= 0) {
+			subset(current.left, min, max, subset);
+		}
+
+		if (comparison2 < 0) {
+			subset(current.right, min, max, subset);
+		}
 	}
 
 	@Override
